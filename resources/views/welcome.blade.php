@@ -28,19 +28,22 @@
     </style>
 </head>
 <body class="antialiased">
-<div class="container text-center">
+<div class="container text-left">
 
-    <div class="row mt-5">
-        <div class="col mt-5" style="font-size: 30px">
-            @auth
-                <a href="{{ route('home') }}" class="px-4 py-2 bg-dark text-white">
-                    Home
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="px-4 py-2 bg-dark text-white">
-                    Log in
-                </a>
-            @endauth
+    <div class="row mt-5 pt-5">
+        <div class="col-12">
+            <h1 class="h1" style="font-size: 200px">Sagra</h1>
+            <div class="h2 text-uppercase float-right">
+                @auth
+                    <a href="{{ route('home') }}" class="text-dark">
+                        Home
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="text-dark">
+                        Log in
+                    </a>
+                @endauth
+            </div>
         </div>
     </div>
 </div>

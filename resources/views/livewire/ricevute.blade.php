@@ -1,5 +1,4 @@
 <div>
-
     <div class="row px-3 pt-2 pb-3">
         <div class="col">
             <input type="text" class="form-control" id="inputSearch" autofocus
@@ -18,13 +17,13 @@
     <table class="table" style="margin-top: 10px;">
         <thead class="thead-dark">
         <tr>
-            <th>ID</th>
-            <th>Data</th>
-            <th>Ora</th>
-            <th>Nome</th>
-            <th>Totale</th>
-            <th>Sconti</th>
-            <th class="text-right">Azioni</th>
+            <th scope="col">ID</th>
+            <th scope="col">Data</th>
+            <th scope="col">Ora</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Totale</th>
+            <th scope="col">Sconti</th>
+            <th scope="col" class="text-right">Azioni</th>
         </tr>
         </thead>
         <tbody>

@@ -31,7 +31,7 @@
         <div class="col-12 col-lg-4">
             <form>
                 <div class="form-group">
-                    <h2>{{$receipt->id}}Totale: <span
+                    <h2>#{{$receipt->id}} Totale: <span
                             class="float-right font-weight-bold">{{$this->receipt->total}} €</span></h2>
                     <button class="btn btn-outline-dark" wire:click="save">Registra</button>
                 </div>

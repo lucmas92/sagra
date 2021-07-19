@@ -9754,6 +9754,25 @@ h3 {
   }
 }
 .head-form {
-  margin-top: 4rem;
+  margin-top: 3.5rem;
   margin-left: 150px;
+}
+
+@media screen and (max-width: 992px) {
+  .head-form {
+    top: 40px;
+  }
+
+  .custom-table, .custom-table2 {
+    margin-top: 1rem;
+  }
+}
+@media screen and (min-width: 992px) {
+  .custom-table {
+    margin-top: 260px;
+  }
+
+  .custom-table2 {
+    margin-top: 140px;
+  }
 }

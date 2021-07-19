@@ -19,6 +19,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+{{--    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">--}}
+
     @yield('page-css')
 
     @livewireStyles
@@ -111,7 +113,7 @@
             </ul>
         </div>
     @endauth
-    <main class="py-4 container-fluid" style="@auth padding-left: 150px; @endauth">
+    <main class="py-2 container-fluid" style="@auth padding-left: 150px; @endauth">
         @yield('content')
     </main>
 </div>
