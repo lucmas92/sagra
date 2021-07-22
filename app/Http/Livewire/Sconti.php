@@ -21,10 +21,12 @@ class Sconti extends Component
         $this->discounts = Discount::all();
         return view('livewire.sconti');
     }
+
     public function abortEdit()
     {
         $this->editingMode = false;
-        $this->name = null;
+        $this->description = '';
+        $this->value = '';
     }
 
     public function delete($id)
@@ -45,12 +47,17 @@ class Sconti extends Component
     }
 
     protected $rules = [
-        'description' => 'required|min:3',
-        'value' => 'required|numeric|min:1',
+        'description' => 'required|min:3|unique:discounts,description',
+        'value' => 'required|numeric|min:1|max:99',
     ];
 
     public function save()
     {
+        if ($this->editingMode) {
+            $this->rules = [
+                'name' => 'required|min:3|unique:discounts,description,' . $this->discount_id,
+            ];
+        }
         $this->validate();
 
         /** @var Discount $discount */
@@ -58,7 +65,12 @@ class Sconti extends Component
         $discount->description = $this->description;
         $discount->discount = $this->value;
         $discount->enabled = ($this->editingMode) ? $this->enabled : false;
-        $discount->save();
+        $saved = $discount->save();
+        if ($saved) {
+            $this->description = '';
+            $this->value = '';
+            $this->editingMode = $this->editingMode ? false : $this->editingMode;
+        }
     }
 
     public function toggleStatus($id)

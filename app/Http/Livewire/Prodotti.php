@@ -56,6 +56,8 @@ class Prodotti extends Component
         $this->description = null;
         $this->price = null;
         $this->quantity = null;
+        $this->meal = null;
+        $this->department = null;
     }
 
     public function delete($id)
@@ -80,16 +82,20 @@ class Prodotti extends Component
     }
 
     protected $rules = [
-        'name' => 'required|min:6',
+        'name' => 'required|min:3|unique:products,name',
         'description' => 'max:255',
-        'price' => 'required|numeric|min:0,10',
+        'price' => 'required|numeric|min:0.10|max:99',
         'department' => 'required',
         'meal' => 'required',
-        'quantity' => 'required|min:1'
+        'quantity' => 'required|numeric|min:1'
     ];
 
     public function save()
     {
+        if ($this->editingMode) {
+            $this->rules['name'] = 'required|min:3|unique:products,name,' . $this->product_id;
+        }
+
         $this->validate();
 
         /** @var Product $product */
@@ -99,16 +105,28 @@ class Prodotti extends Component
         $product->price = $this->price;
         $product->department_id = $this->department;
         $product->enabled = ($this->editingMode) ? $product->enabled : false;
-        $product->save();
+        $saved = $product->save();
 
-        $product->meal()->detach();
-        $product->meal()->attach($this->meal);
-        Warehouse::updateOrCreate(
-            ['product_id' => $product->id],
-            [
-                'product_id' => $product->id,
-                'quantity' => $this->quantity,
-                'min_quantity' => 1,
-            ]);
+        if ($saved) {
+
+
+            $product->meal()->detach();
+            $product->meal()->attach($this->meal);
+            Warehouse::updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'product_id' => $product->id,
+                    'quantity' => $this->quantity ?? 1,
+                    'min_quantity' => 1,
+                ]);
+
+            $this->name = '';
+            $this->description = '';
+            $this->price = '';
+            $this->department = null;
+            $this->meal = null;
+            $this->quantity = '';
+            $this->editingMode = $this->editingMode ? false : $this->editingMode;
+        }
     }
 }

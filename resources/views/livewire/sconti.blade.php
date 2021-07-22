@@ -1,58 +1,67 @@
-<div>
-    <button class="btn btn-block d-lg-none btn-primary" type="button" data-toggle="collapse" data-target="#formCollapse" aria-expanded="false" aria-controls="formCollapse">
-        Apri Form @if($editingMode)<span>X</span>@endif
+<div x-data={show:false}>
+    <button x-on:click.prevent="show=!show" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+            type="button">
+        <span x-show="show">Chiudi</span><span x-show="!show">Apri</span> Form @if($editingMode)<i
+                class="fas fa-exclamation-circle"></i>@endif
     </button>
-    <form id="formCollapse" class="collapse border-bottom border-2 fixed-top bg-light position-absolute position-lg-relative d-lg-block py-4 head-form">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-md-4">
-                    <div class="form-group">
-                        <label for="inputDescription">Nome</label>
-                        <input type="text" class="form-control @error('name') border border-danger @enderror"
-                               id="inputDescription" aria-describedby="descriptionHelp" minlength="3"
-                               placeholder="Inserisci la descrizione" required wire:model="description">
-                        <small id="descriptionHelp" class="form-text text-muted">Inserisci la descrizione dello Sconto</small>
-                    </div>
-                </div>
-                <div class="col-12 col-md-3">
-                    <div class="form-group">
-                        <label for="inputDiscount">Percentuale</label>
-                        <input type="number" class="form-control @error('name') border border-danger @enderror"
-                               id="inputDiscount" aria-describedby="discountHelp" min="3"
-                               placeholder="Inserisci la percentuale" required wire:model="value">
-                        <small id="discountHelp" class="form-text text-muted">Inserisci la percentuale di Sconto</small>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 pt-2">
-                    <button type="submit" class="btn btn-primary mt-4" wire:click="save">
-                        {{$editingMode ? 'Aggiorna' : 'Aggiungi'}}
+    <form x-show="show" class="head-form" wire:submit.prevent="save">
+        <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="w-1/2 px-3 mt-3">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="inputDescription">
+                    Descrizione
+                </label>
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                       id="inputDescription" type="text" wire:model="description" placeholder="Inserisci il nome">
+                <p class="text-gray-600 text-xs italic">Inserisci la descrizione dello Sconto</p>
+                @error('description')
+                <span class="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1">
+                    {{ $message }}
+                </span>
+                @enderror
+            </div>
+            <div class="w-1/2 px-3 mt-3">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="inputName">
+                    Percentuale
+                </label>
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                       id="inputName" type="text" wire:model="value" placeholder="Inserisci la percentuale">
+                <p class="text-gray-600 text-xs italic">Inserisci la percentuale di Sconto</p>
+                @error('value')
+                <span class="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1">
+                    {{ $message }}
+                </span>
+                @enderror
+            </div>
+            <div class="px-2">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mt-4">
+                    {{$editingMode ? 'Aggiorna' : 'Aggiungi'}}
+                </button>
+                @if(isset($editingMode) && $editingMode)
+                    <button type="reset" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mt-4"
+                            wire:click="abortEdit" x-on:click.prevent="show=false">
+                        Annulla
                     </button>
-                    @if(isset($editingMode) && $editingMode)
-                        <button type="submit" class="btn btn-danger mt-4" wire:click="abortEdit">
-                            Annulla
-                        </button>
-                    @endif
-                </div>
+                @endif
             </div>
         </div>
     </form>
 
-    <table class="table custom-table2 table-responsive-xs" style="overflow-x: scroll">
+    <table class="table-fixed mt-3 w-full" style="overflow-x: scroll">
         <thead class="thead-dark">
         <tr>
-            <th scope="col">Descrizione</th>
-            <th scope="col">Sconto</th>
-            <th scope="col">Stato</th>
-            <th scope="col" class="text-right">Azioni</th>
+            <th class="w-auto">Descrizione</th>
+            <th class="w-1/8 text-center">Sconto</th>
+            <th class="w-1/8 text-center">Stato</th>
+            <th class="w-auto text-right"></th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="bg-white divide-y divide-gray-200">
 
         @foreach($discounts as $discount)
             <tr>
-                <td>{{$discount->description}}</td>
-                <td>{{$discount->discount}}</td>
-                <td>
+                <td class="py-4 px-2">{{$discount->description}}</td>
+                <td class="py-4 px-2 text-center">{{$discount->discount}}</td>
+                <td class="py-4 px-2 text-center">
                     <button class=" px-3 py-2 border-0 bg-transparent h3"
                             wire:click="toggleStatus({{$discount->id}})">
                         @if($discount->enabled)
@@ -62,9 +71,13 @@
                         @endif
                     </button>
                 </td>
-                <td class="text-right">
-                    <button wire:click="edit({{$discount->id}})">Edit</button>
-                    <button wire:click="delete({{$discount->id}})">Delete</button>
+                <td class="py-4 px-2 text-right">
+                    <button class="mx-1" wire:click="edit({{$discount->id}})" x-on:click.prevent="show=true">
+                        <i class="far fa-edit"></i>
+                    </button>
+                    <button class="mx-1" wire:click="delete({{$discount->id}})">
+                        <i class="far fa-trash-alt"></i>
+                    </button>
                 </td>
             </tr>
         @endforeach

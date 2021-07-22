@@ -144,7 +144,8 @@ class NuovaRicevuta extends Component
     }
 
     protected $rules = [
-        'receipt_name' => 'required|min:3',
+        'receipt_name' => 'required|min:3|max:255',
+        'receipt_note' => 'max:255',
     ];
 
     public function save()
@@ -170,6 +171,7 @@ class NuovaRicevuta extends Component
 
         $this->receipt_discount = null;
         $this->receipt_name = '';
+        $this->receipt_note = '';
         $this->receipt_products = [];
         $this->receipt = null;
         Session::forget('receipt_id');

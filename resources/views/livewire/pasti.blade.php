@@ -1,61 +1,74 @@
-<div>
-    <button class="btn btn-block d-lg-none btn-primary" type="button" data-toggle="collapse" data-target="#formCollapse" aria-expanded="false" aria-controls="formCollapse">
-        Apri Form @if($editingMode)<span>X</span>@endif
+<div x-data={show:false}>
+    <button x-on:click.prevent="show=!show" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+            type="button">
+        <span x-show="show">Chiudi</span><span x-show="!show">Apri</span> Form @if($editingMode)<i
+                class="fas fa-exclamation-circle"></i>@endif
     </button>
-    <form id="formCollapse" class="collapse border-bottom border-2 fixed-top bg-light py-4 d-lg-block head-form">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-md-5">
-                    <div class="form-group">
-                        <label for="inputName">Nome</label>
-                        <input type="text" class="form-control @error('name') border border-danger @enderror"
-                               id="inputName" aria-describedby="nameHelp" minlength="3"
-                               placeholder="Inserisci il nome" required wire:model="name">
-                        <small id="nameHelp" class="form-text text-muted">Inserisci il nome del Pasto</small>
-                    </div>
-                </div>
-                <div class="col-12 col-md-3">
-                    <div class="form-group">
-                        <label for="inputPosition">Posizione</label>
-                        <input type="text" class="form-control @error('position') border border-danger @enderror"
-                               id="inputPosition" aria-describedby="positionHelp"
-                               placeholder="Inserisci la posizione" wire:model="position">
-                        <small id="positionHelp" class="form-text text-muted">
-                            Inserisci la posizione del Pasto
-                        </small>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 pt-2">
-                    <button type="submit" class="btn btn-primary mt-4" wire:click="save">
-                        {{$editingMode ? 'Aggiorna' : 'Aggiungi'}}
+    <form x-show="show" class="head-form" wire:submit.prevent="save">
+        <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="w-1/2 px-3 mt-3">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="inputName">
+                    Nome
+                </label>
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                       id="inputName" type="text" wire:model="name" placeholder="Inserisci il nome">
+                <p class="text-gray-600 text-xs italic">Inserisci il nome del Pasto</p>
+                @error('name')
+                <span class="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1">
+                    {{ $message }}
+                </span>
+                @enderror
+
+            </div>
+            <div class="w-1/2 px-3 mt-3">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="inputPosition">
+                    Posizione
+                </label>
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                       id="inputPosition" type="text" wire:model="position" placeholder="Inserisci la posizione">
+                <p class="text-gray-600 text-xs italic">Inserisci la posizione del Pasto</p>
+                @error('position')
+                <span class="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1">
+                    {{ $message }}
+                </span>
+                @enderror
+            </div>
+
+            <div class="px-2">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mt-4">
+                    {{$editingMode ? 'Aggiorna' : 'Aggiungi'}}
+                </button>
+                @if(isset($editingMode) && $editingMode)
+                    <button type="reset" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mt-4"
+                            wire:click="abortEdit" x-on:click.prevent="show=false">
+                        Annulla
                     </button>
-                    @if(isset($editingMode) && $editingMode)
-                        <button type="submit" class="btn btn-danger mt-4" wire:click="abortEdit">
-                            Annulla
-                        </button>
-                    @endif
-                </div>
+                @endif
             </div>
         </div>
     </form>
 
-    <table class="table custom-table2 table-responsive-xs" style="overflow-x: scroll">
+    <table class="table-fixed mt-3 w-full" style="overflow-x: scroll">
         <thead class="thead-dark">
         <tr>
-            <th scope="col">Nome</th>
-            <th scope="col">Posizione</th>
-            <th scope="col" class="text-right">Azioni</th>
+            <th class="2-auto">Nome</th>
+            <th class="2-auto">Posizione</th>
+            <th class="2-auto text-right"></th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="bg-white divide-y divide-gray-200">
 
         @foreach($meals as $meal)
             <tr>
-                <td>{{$meal->name}}</td>
-                <td>{{$meal->position}}</td>
-                <td class="text-right">
-                    <button wire:click="edit({{$meal->id}})">Edit</button>
-                    <button wire:click="delete({{$meal->id}})">Delete</button>
+                <td class="py-4 px-2">{{$meal->name}}</td>
+                <td class="py-4 px-2">{{$meal->position}}</td>
+                <td class="py-4 px-2 text-right">
+                    <button class="mx-1" wire:click="edit({{$meal->id}})" x-on:click.prevent="show=true">
+                        <i class="far fa-edit"></i>
+                    </button>
+                    <button class="mx-1" wire:click="delete({{$meal->id}})">
+                        <i class="far fa-trash-alt"></i>
+                    </button>
                 </td>
             </tr>
         @endforeach

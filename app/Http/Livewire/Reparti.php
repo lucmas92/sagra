@@ -43,16 +43,25 @@ class Reparti extends Component
     }
 
     protected $rules = [
-        'name' => 'required|min:3',
+        'name' => 'required|min:3|unique:departments',
     ];
 
     public function save()
     {
+        if ($this->editingMode) {
+            $this->rules = [
+                'name' => 'required|min:3|unique:departments,name,' . $this->department_id,
+            ];
+        }
         $this->validate();
 
         /** @var Department $department */
         $department = ($this->editingMode) ? Department::findOrFail($this->department_id) : new Department();
         $department->name = $this->name;
-        $department->save();
+        $saved = $department->save();
+        if ($saved) {
+            $this->name = '';
+            $this->editingMode = $this->editingMode ? false : $this->editingMode;
+        }
     }
 }

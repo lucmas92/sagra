@@ -3,12 +3,14 @@
 namespace App\Http\Livewire;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Menu extends Component
 {
     public $menus = [];
     public $editingMode = false;
+    public $showModal = false;
 
     public $menu_id;
     public $name;
@@ -66,28 +68,43 @@ class Menu extends Component
 
 
     protected $rules = [
-        'name' => 'required|min:6',
+        'name' => 'required|min:6|unique:menus',
         'description' => 'max:255',
-        'endDate' => 'after:start_date',
+        'startDate' => 'date',
+        'endDate' => 'date|after:start_date',
     ];
 
     public function save()
     {
+        if ($this->editingMode) {
+            $this->rules['name'] = 'required|min:6|unique:menus,name,' . $this->menu_id;
+        }
+
         $this->validate();
 
-        $menu = ($this->editingMode) ? \App\Models\Menu::findOrFail($this->menu_id) : new \App\Models\Menu();
-        $menu->name = $this->name;
-        $menu->description = $this->description;
-        $menu->start_date = $this->startDate;
-        $menu->end_date = $this->endDate;
-        $menu->save();
+        try {
+            $menu = ($this->editingMode) ? \App\Models\Menu::findOrFail($this->menu_id) : new \App\Models\Menu();
+            $menu->name = $this->name;
+            $menu->description = $this->description;
+            $menu->start_date = $this->startDate;
+            $menu->end_date = $this->endDate;
+            $saved = $menu->save();
+            if ($saved) {
+                $this->name = '';
+                $menu->description = '';
+                $menu->start_date = '';
+                $menu->end_date = '';
+                $this->editingMode = $this->editingMode ? false : $this->editingMode;
+            }
+        }catch (\Exception $e){
+            Log::error($e->getMessage());
+        }
     }
 
     public function compile($id)
     {
-        logger('compile menu ' . $id);
+        $this->showModal = true;
         $this->compilingMenu = \App\Models\Menu::findOrFail($id);
-        logger($this->compilingMenu);
         $this->products = Product::all();
         $this->emit('menuCompile'); // Close model to using to jquery
     }
@@ -102,6 +119,11 @@ class Menu extends Component
     public function addToMenu($id)
     {
         logger('aggiunta prodotto ' . $id . ' da menu ' . $this->compilingMenu->id);
+
+        // se il prodotto è giò presente non lo inserisco di nuovo
+        if ($this->compilingMenu->products()->find($id))
+            return;
+
         $this->compilingMenu->products()->attach($id);
         $this->compilingMenu->save();
 
